@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-
 class StatusChoices(models.TextChoices):
     PENDING = 'P', 'Pending'
     IN_PROGRESS = 'IP', 'In Progress'
