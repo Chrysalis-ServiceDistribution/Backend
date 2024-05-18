@@ -7,6 +7,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email']
+        extra_kwargs = {'password':{'write_only': True}}
 
 
     def create(self, validated_data):
@@ -22,7 +23,7 @@ class ServiceSerializer(serializers.ModelSerializer):
   user =UserSerializer(read_only=True)
   class Meta:
     model = Service
-    fiels = '__all__'
+    fields = '__all__'
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -32,7 +33,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
    class Meta:
       model = Task
-      fiels = '__all__'
+      fields = '__all__'
   
 
 class FormfieldSerializer(serializers.ModelSerializer):
@@ -42,7 +43,7 @@ class FormfieldSerializer(serializers.ModelSerializer):
    
    class Meta:
     model = FormField
-    fiels = '__all__'
+    fields = '__all__'
 
 
 class RequestFieldSerializer(serializers.ModelSerializer):
@@ -52,7 +53,7 @@ class RequestFieldSerializer(serializers.ModelSerializer):
   options = serializers.JSONField(required=False)
   class Meta:
     model = RequestField
-    fiels = '__all__'
+    fields = '__all__'
 
 
 
