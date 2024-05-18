@@ -1,10 +1,11 @@
-from django.shortcuts import get_object_or_404
-from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.shortcuts import get_object_or_404
 from .models import Service, Task, FormField, RequestField, StatusChoices
 from .serializers import UserSerializer, ServiceSerializer, TaskSerializer, FormFieldSerializer, RequestFieldSerializer
 
@@ -25,6 +26,7 @@ class CreateUserView(generics.CreateAPIView):
 
 class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
+    renderer_classes = [JSONRenderer, BrowsableAPIRenderer]
 
     def post(self, request):
         username = request.data.get('username')
@@ -41,6 +43,7 @@ class LoginView(APIView):
 
 class VerifyUserView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+    renderer_classes = [JSONRenderer, BrowsableAPIRenderer]
 
     def get(self, request):
         user = request.user
