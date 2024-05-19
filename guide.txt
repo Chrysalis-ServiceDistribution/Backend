@@ -1,0 +1,111 @@
+Create and Activate a Virtual Environment
+
+Install Dependencies
+'pip install -r requirements.txt'
+
+Apply Migrations
+'python manage.py migrate'
+
+Run the Development Server
+'python manage.py runserver'
+
+Use Postman to Test API Endpoints
+
+Register a New User
+URL: http://127.0.0.1:8000/api/auth/register/
+Method: POST
+Headers:
+Content-Type: application/json
+Body:
+     {
+  "username": "testuser",
+  "email": "test@example.com",
+  "password": "testpassword"
+}
+
+Log In to Get a JWT Token
+URL: http://127.0.0.1:8000/api/auth/login/
+Method: POST
+Headers:
+Content-Type: application/json
+Body:
+     {
+  "username": "testuser",
+  "password": "testpassword"
+}
+Expected Response:
+                  {
+  "refresh": "<refresh_token>",
+  "access": "<access_token>",
+  "user": {
+    "id": 1,
+    "username": "testuser",
+    "email": "test@example.com"
+  }
+}
+
+Use the Access Token for Subsequent Requests
+
+Create a New Service with Form Fields
+URL: http://127.0.0.1:8000/api/services/
+Method: POST
+Headers:
+Content-Type: application/json
+Authorization: Bearer <your_access_token>
+Body:
+     {
+  "name": "Web Development",
+  "description": "Full-stack web development services",
+  "form_fields": [
+    {
+      "type": "text",
+      "prompt": "What is your budget?",
+      "index": 1,
+      "choices": null
+    },
+    {
+      "type": "checkbox",
+      "prompt": "Do you need ongoing support?",
+      "index": 2,
+      "choices": ["Yes", "No", "Maybe"]
+    }
+  ]
+}
+
+Retrieve All Services
+URL: http://127.0.0.1:8000/api/services/
+Method: GET
+Headers:
+Authorization: Bearer <your_access_token>
+
+Retrieve a Specific Service
+URL: http://127.0.0.1:8000/api/services/<service_id>/
+Method: GET
+Headers:
+Authorization: Bearer <your_access_token>
+
+Submit a Request to a Service
+URL: http://127.0.0.1:8000/api/services/<service_id>/submit_request/
+Method: POST
+Headers:
+Content-Type: application/json
+Authorization: Bearer <your_access_token>
+Body:
+     {
+  "req": {
+    "some_key": "some_value"
+  },
+  "fields": [
+    {
+      "type": "text",
+      "value": "5000",
+      "index": 1
+    },
+    {
+      "type": "checkbox",
+      "value": "true",
+      "index": 2
+    }
+  ]
+}
+

@@ -24,9 +24,16 @@ class FormFieldSerializer(serializers.ModelSerializer):
         fields = ['id', 'type', 'prompt', 'index', 'choices']
 
 
+class NestedFormFieldSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FormField
+        fields = ['id', 'type', 'prompt', 'index', 'choices']
+        read_only_fields = ['id']
+
+
 class ServiceSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
-    form_fields = FormFieldSerializer(many=True)
+    form_fields = NestedFormFieldSerializer(many=True)
 
     class Meta:
         model = Service
@@ -69,8 +76,16 @@ class RequestFieldSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     service = ServiceSerializer(read_only=True)
     client = UserSerializer(read_only=True)
+    request_fields = RequestFieldSerializer(many=True, required=False)
     status = serializers.ChoiceField(choices=StatusChoices.choices, default=StatusChoices.PENDING)
 
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = ['id', 'service', 'client', 'req', 'status', 'request_fields']
+
+    def create(self, validated_data):
+        request_fields_data = validated_data.pop('request_fields', [])
+        task = Task.objects.create(**validated_data)
+        for request_field_data in request_fields_data:
+            RequestField.objects.create(task=task, **request_field_data)
+        return task
