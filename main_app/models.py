@@ -56,7 +56,6 @@ class FormField(models.Model):
     type = models.CharField(max_length=10, choices=FieldType.choices)
     prompt = models.CharField(max_length=255)
     index = models.IntegerField()
-    choices = models.JSONField(blank=True, null=True)
 
     def __str__(self):
         return f'{self.prompt} ({self.get_type_display()})'
@@ -95,9 +94,7 @@ class CheckboxFormField(models.Model):
 class RequestField(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='request_fields')
     type = models.CharField(max_length=10, choices=FieldType.choices)
-    value = models.CharField(max_length=255, blank=True, null=True)
     index = models.IntegerField()
-    options = models.JSONField(blank=True, null=True)
 
     def __str__(self):
         return f'{self.get_type_display()} field for Task {self.task.id}'
@@ -109,6 +106,7 @@ class TextRequestField(models.Model):
         on_delete=models.CASCADE,
         primary_key=True,
     )
+    value = models.CharField(max_length=250)
 
 
 class RadioRequestField(models.Model):
@@ -117,9 +115,7 @@ class RadioRequestField(models.Model):
         on_delete=models.CASCADE,
         primary_key=True,
     )
-    choices = postgresFields.ArrayField(
-        models.CharField(max_length=100, blank=False),
-    )
+    selected_choice = models.IntegerField()
 
 
 class CheckboxRequestField(models.Model):
@@ -128,6 +124,6 @@ class CheckboxRequestField(models.Model):
         on_delete=models.CASCADE,
         primary_key=True,
     )
-    choices = postgresFields.ArrayField(
-        models.CharField(max_length=100, blank=False),
+    selected_choices = postgresFields.ArrayField(
+        models.IntegerField()
     )
