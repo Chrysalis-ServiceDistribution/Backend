@@ -55,6 +55,9 @@ class RequestField(models.Model):
     value = models.CharField(max_length=255, blank=True, null=True)
     index = models.IntegerField()
     options = models.JSONField(blank=True, null=True)
+    prompt = models.CharField(max_length=255, blank=True, null=True)
+    choices = models.JSONField(blank=True, null=True)
 
     def __str__(self):
         return f'{self.get_type_display()} field for Task {self.task.id}'
+
