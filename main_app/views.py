@@ -138,9 +138,10 @@ class SubmitRequest(APIView):
 
     def post(self, request, service_id):
         service = get_object_or_404(Service, id=service_id)
+        client = request.user
         task_data = {
             'service': service.id,
-            'client': request.user.id,
+            'client': client.id,
             'req': request.data['req'],
             'status': StatusChoices.PENDING
         }
@@ -151,6 +152,7 @@ class SubmitRequest(APIView):
                 RequestField.objects.create(task=task, **field_data)
             return Response(task_serializer.data, status=status.HTTP_201_CREATED)
         return Response(task_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class UpdateTaskStatus(APIView):
     permission_classes = [permissions.IsAuthenticated]

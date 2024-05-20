@@ -2,7 +2,6 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Service, Task, FormField, RequestField, StatusChoices, FieldType
 
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -17,19 +16,16 @@ class UserSerializer(serializers.ModelSerializer):
         )
         return user
 
-
 class FormFieldSerializer(serializers.ModelSerializer):
     class Meta:
         model = FormField
         fields = ['id', 'type', 'prompt', 'index', 'choices']
-
 
 class NestedFormFieldSerializer(serializers.ModelSerializer):
     class Meta:
         model = FormField
         fields = ['id', 'type', 'prompt', 'index', 'choices']
         read_only_fields = ['id']
-
 
 class ServiceSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -66,16 +62,14 @@ class ServiceSerializer(serializers.ModelSerializer):
                 FormField.objects.create(service=instance, **form_field_data)
         return instance
 
-
 class RequestFieldSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestField
         fields = ['id', 'task', 'type', 'value', 'index', 'options']
 
-
 class TaskSerializer(serializers.ModelSerializer):
-    service = ServiceSerializer(read_only=True)
-    client = UserSerializer(read_only=True)
+    service = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all())
+    client = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     request_fields = RequestFieldSerializer(many=True, required=False)
     status = serializers.ChoiceField(choices=StatusChoices.choices, default=StatusChoices.PENDING)
 
