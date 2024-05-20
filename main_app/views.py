@@ -141,16 +141,11 @@ class UpdateTaskStatus(APIView):
 
     def post(self, request, task_id):
         task = get_object_or_404(Task, id=task_id)
-        status = request.data.get('status')
-        if status not in dict(StatusChoices.choices):
+        new_status = request.data.get('status')
+        if new_status not in dict(StatusChoices.choices):
             return Response({'error': 'Invalid status'}, status=status.HTTP_400_BAD_REQUEST)
 
-        task.status = status
+        task.status = new_status
         task.save()
-
-        if status == StatusChoices.COMPLETED:
-            pass
-        elif status == StatusChoices.CANCELLED:
-            pass
 
         return Response(TaskSerializer(task).data, status=status.HTTP_200_OK)
