@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.postgres import fields as postgresFields
 
 
 class StatusChoices(models.TextChoices):
@@ -15,7 +16,19 @@ class FieldType(models.TextChoices):
     CHECKBOX = 'checkbox', 'Checkbox'
 
 
+class MainService(models.Model):
+    currentVersion = models.OneToOneField(
+        'main_app.models.Service',
+        on_delete=models.CASCADE,
+    )
+
+
 class Service(models.Model):
+    service = models.ForeignKey(
+        MainService,
+        on_delete=models.CASCADE,
+        related_name='versions',
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='services')
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=250, blank=True, null=True)
@@ -49,6 +62,36 @@ class FormField(models.Model):
         return f'{self.prompt} ({self.get_type_display()})'
 
 
+class TextFormField(models.Model):
+    field = models.OneToOneField(
+        FormField,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+
+
+class RadioFormField(models.Model):
+    field = models.OneToOneField(
+        FormField,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+    choices = postgresFields.ArrayField(
+        models.CharField(max_length=100, blank=False),
+    )
+
+
+class CheckboxFormField(models.Model):
+    field = models.OneToOneField(
+        FormField,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+    choices = postgresFields.ArrayField(
+        models.CharField(max_length=100, blank=False),
+    )
+
+
 class RequestField(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='request_fields')
     type = models.CharField(max_length=10, choices=FieldType.choices)
@@ -58,3 +101,33 @@ class RequestField(models.Model):
 
     def __str__(self):
         return f'{self.get_type_display()} field for Task {self.task.id}'
+
+
+class TextRequestField(models.Model):
+    field = models.OneToOneField(
+        RequestField,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+
+
+class RadioRequestField(models.Model):
+    field = models.OneToOneField(
+        RequestField,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+    choices = postgresFields.ArrayField(
+        models.CharField(max_length=100, blank=False),
+    )
+
+
+class CheckboxRequestField(models.Model):
+    field = models.OneToOneField(
+        RequestField,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+    choices = postgresFields.ArrayField(
+        models.CharField(max_length=100, blank=False),
+    )
