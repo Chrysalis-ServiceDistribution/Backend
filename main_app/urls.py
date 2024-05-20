@@ -6,7 +6,8 @@ from .views import (
     TaskList, TaskDetail,
     FormFieldList, FormFieldDetail,
     RequestFieldList, RequestFieldDetail,
-    SubmitRequest, UpdateTaskStatus
+    SubmitRequest, UpdateTaskStatus,
+    UserServiceList
 )
 
 urlpatterns = [
@@ -18,6 +19,8 @@ urlpatterns = [
     path('services/', ServiceList.as_view(), name='service_list'),
     path('services/<int:pk>/', ServiceDetail.as_view(), name='service_detail'),
     path('services/<int:pk>/formfields/', ServiceFormFields.as_view(), name='service_formfields'),
+
+    path('users/<int:user_id>/services/', UserServiceList.as_view(), name='user_service_list'),
 
     path('tasks/', TaskList.as_view(), name='task_list'),
     path('tasks/<int:pk>/', TaskDetail.as_view(), name='task_detail'),

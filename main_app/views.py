@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from .models import Service, Task, FormField, RequestField, StatusChoices
 from .serializers import UserSerializer, ServiceSerializer, TaskSerializer, FormFieldSerializer, RequestFieldSerializer
 
+
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -23,6 +24,7 @@ class CreateUserView(generics.CreateAPIView):
             'access': str(refresh.access_token),
             'user': response.data
         })
+
 
 class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -41,6 +43,7 @@ class LoginView(APIView):
             })
         return Response({'error': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
+
 class VerifyUserView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     renderer_classes = [JSONRenderer, BrowsableAPIRenderer]
@@ -54,6 +57,16 @@ class VerifyUserView(APIView):
             'user': UserSerializer(user).data
         })
 
+
+class UserServiceList(generics.ListAPIView):
+    serializer_class = ServiceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        return Service.objects.filter(user_id=user_id)
+
+
 class Home(APIView):
     def get(self, request):
         data = {
@@ -61,6 +74,7 @@ class Home(APIView):
             'status': "success"
         }
         return Response(data)
+
 
 class ServiceList(generics.ListCreateAPIView):
     queryset = Service.objects.all()
@@ -70,6 +84,7 @@ class ServiceList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+
 class ServiceDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
@@ -77,6 +92,7 @@ class ServiceDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def perform_update(self, serializer):
         serializer.save()
+
 
 class ServiceFormFields(generics.ListCreateAPIView):
     serializer_class = FormFieldSerializer
@@ -86,35 +102,42 @@ class ServiceFormFields(generics.ListCreateAPIView):
         service_id = self.kwargs['pk']
         return FormField.objects.filter(service_id=service_id)
 
+
 class TaskList(generics.ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
+
 
 class TaskDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+
 class FormFieldList(generics.ListCreateAPIView):
     queryset = FormField.objects.all()
     serializer_class = FormFieldSerializer
     permission_classes = [permissions.IsAuthenticated]
+
 
 class FormFieldDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = FormField.objects.all()
     serializer_class = FormFieldSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+
 class RequestFieldList(generics.ListCreateAPIView):
     queryset = RequestField.objects.all()
     serializer_class = RequestFieldSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+
 class RequestFieldDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = RequestField.objects.all()
     serializer_class = RequestFieldSerializer
     permission_classes = [permissions.IsAuthenticated]
+
 
 class SubmitRequest(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -132,9 +155,19 @@ class SubmitRequest(APIView):
         if task_serializer.is_valid():
             task = task_serializer.save()
             for field_data in request.data.get('fields', []):
-                RequestField.objects.create(task=task, **field_data)
+                form_field = FormField.objects.get(service=service, index=field_data['index'])
+                RequestField.objects.create(
+                    task=task,
+                    type=field_data['type'],
+                    value=field_data['value'],
+                    index=field_data['index'],
+                    options=field_data['options'],
+                    prompt=form_field.prompt,  # Copy prompt
+                    choices=form_field.choices  # Copy choices
+                )
             return Response(task_serializer.data, status=status.HTTP_201_CREATED)
         return Response(task_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class UpdateTaskStatus(APIView):
     permission_classes = [permissions.IsAuthenticated]

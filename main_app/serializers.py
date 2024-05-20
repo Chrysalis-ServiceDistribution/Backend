@@ -32,13 +32,14 @@ class RequestFieldSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RequestField
-        fields = ['id', 'task', 'type', 'value', 'index', 'options', 'form_field']
+        fields = ['id', 'task', 'type', 'value', 'index', 'options', 'prompt', 'choices', 'form_field']
 
     def get_form_field(self, obj):
         form_field = FormField.objects.filter(service=obj.task.service, index=obj.index).first()
         if form_field:
             return FormFieldSerializer(form_field).data
         return None
+
 
 class ServiceSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
