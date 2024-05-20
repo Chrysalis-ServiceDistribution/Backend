@@ -106,7 +106,7 @@ class FormFieldDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FormFieldSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-class RequestFieldList(generics.ListCreateAPIView):
+class RequestFieldList(generics.ListAPIView):
     queryset = RequestField.objects.all()
     serializer_class = RequestFieldSerializer
     permission_classes = [permissions.IsAuthenticated]

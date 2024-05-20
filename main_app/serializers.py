@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Service, Task, FormField, RequestField, StatusChoices, FieldType
+from .models import Service, Task, FormField, TextFormField, RadioFormField, CheckboxFormField, RequestField, StatusChoices, FieldType, TextRequestField, RadioRequestField, CheckboxRequestField
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -27,9 +27,54 @@ class NestedFormFieldSerializer(serializers.ModelSerializer):
         fields = ['id', 'type', 'prompt', 'index', 'choices']
         read_only_fields = ['id']
 
+
+class TextFormFieldSerializer(serializers.ModelSerializer):
+    type = serializers.SerializerMethodField()
+
+    def get_type(self, obj):
+        return 'text'
+
+    class Meta:
+        model = TextFormField
+        fields = ['type', 'prompt']
+
+
+class RadioFormFieldSerializer(serializers.ModelSerializer):
+    type = serializers.SerializerMethodField()
+
+    def get_type(self, obj):
+        return 'radio'
+
+    class Meta:
+        model = RadioFormField
+        fields = ['type', 'prompt', 'choices']
+
+
+class CheckboxFormFieldSerializer(serializers.ModelSerializer):
+    type = serializers.SerializerMethodField()
+
+    def get_type(self, obj):
+        return 'checkbox'
+
+    class Meta:
+        model = CheckboxFormField
+        fields = ['type', 'prompt', 'choices']
+
+
 class ServiceSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
-    form_fields = NestedFormFieldSerializer(many=True)
+    form_fields = serializers.SerializerMethodField()
+
+    def get_form_fields(self, obj):
+        results = []
+        for form_field in obj.form_fields:
+            if form_field.type == 'text':
+                return TextFormFieldSerializer(form_field.text_form_field)
+            elif form_field.type == 'radio':
+                return RadioFormFieldSerializer(form_field.radio_form_field)
+            else:
+                return CheckboxFormFieldSerializer(form_field.radio_form_field)
+        return results
 
     class Meta:
         model = Service
@@ -56,16 +101,62 @@ class ServiceSerializer(serializers.ModelSerializer):
             FormField.objects.create(service=instance, **form_field_data)
         return instance
 
+
 class RequestFieldSerializer(serializers.ModelSerializer):
     class Meta:
         model = RequestField
         fields = ['id', 'task', 'type', 'value', 'index', 'options']
 
+
+class TextRequestFieldSerializer(serializers.ModelSerializer):
+    type = serializers.SerializerMethodField()
+
+    def get_type(self, obj):
+        return 'text'
+
+    class Meta:
+        model = TextRequestField
+        fields = ['type', 'prompt']
+
+
+class RadioRequestFieldSerializer(serializers.ModelSerializer):
+    type = serializers.SerializerMethodField()
+
+    def get_type(self, obj):
+        return 'radio'
+
+    class Meta:
+        model = RadioRequestField
+        fields = ['type', 'prompt', 'choices']
+
+
+class CheckboxRequestFieldSerializer(serializers.ModelSerializer):
+    type = serializers.SerializerMethodField()
+
+    def get_type(self, obj):
+        return 'checkbox'
+
+    class Meta:
+        model = CheckboxRequestField
+        fields = ['type', 'prompt', 'choices']
+
+
 class TaskSerializer(serializers.ModelSerializer):
     service = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all())
     client = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    request_fields = RequestFieldSerializer(many=True, required=False)
     status = serializers.ChoiceField(choices=StatusChoices.choices, default=StatusChoices.PENDING)
+    request_fields = serializers.SerializerMethodField()
+
+    def get_request_fields(self, obj):
+        results = []
+        for request_field in obj.request_fields:
+            if request_field.type == 'text':
+                return TextRequestFieldSerializer(request_field.text_form_field)
+            elif request_field.type == 'radio':
+                return RadioRequestFieldSerializer(request_field.radio_form_field)
+            else:
+                return CheckboxRequestFieldSerializer(request_field.radio_form_field)
+        return results
 
     class Meta:
         model = Task
