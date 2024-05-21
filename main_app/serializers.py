@@ -70,7 +70,7 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = [
-            'id', 'service', 'client', 'req', 'status', 'request_fields'
+            'id', 'service', 'client', 'status', 'request_fields'
         ]
 
 class NestedFormFieldSerializer(serializers.ModelSerializer):
