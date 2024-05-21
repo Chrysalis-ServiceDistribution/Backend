@@ -48,6 +48,7 @@ class FormFieldSerializer(serializers.ModelSerializer):
         fields = ['id', 'type', 'prompt', 'index', 'choices']
 
 
+
 class RequestFieldSerializer(serializers.ModelSerializer):
     form_field = serializers.SerializerMethodField()
 
@@ -64,10 +65,13 @@ class RequestFieldSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     service = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all())
     client = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    request_fields = RequestFieldSerializer(many=True, read_only=True)
 
     class Meta:
         model = Task
-        fields = ['id', 'service', 'client', 'req', 'status']
+        fields = [
+            'id', 'service', 'client', 'req', 'status', 'request_fields'
+        ]
 
 class NestedFormFieldSerializer(serializers.ModelSerializer):
     class Meta:
