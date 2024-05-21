@@ -32,7 +32,6 @@ class Service(models.Model):
 class Task(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='tasks')
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tasks')
-    req = models.JSONField()
     status = models.CharField(
         max_length=2,
         choices=StatusChoices.choices,
