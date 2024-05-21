@@ -65,6 +65,14 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
+class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
 class UserServiceList(generics.ListAPIView):
     serializer_class = ServiceSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -73,6 +81,19 @@ class UserServiceList(generics.ListAPIView):
         user_id = self.kwargs['user_id']
         return Service.objects.filter(user_id=user_id)
 
+
+class UserTasksList(generics.ListAPIView):
+    serializer_class = TaskSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Task.objects.filter(client=self.request.user)
+
+class UserDetailView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'id'
 
 class Home(APIView):
     def get(self, request):
@@ -189,3 +210,24 @@ class UpdateTaskStatus(APIView):
         task.save()
 
         return Response(TaskSerializer(task).data, status=status.HTTP_200_OK)
+
+class UserDetailWithServicesAndTasksView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user_id = self.kwargs.get('user_id')
+        user = get_object_or_404(User, id=user_id)
+
+        user_data = UserSerializer(user).data
+        user_services = ServiceSerializer(Service.objects.filter(user=user), many=True).data
+        user_tasks = TaskSerializer(Task.objects.filter(client=user), many=True).data
+
+        data = {
+            'user': user_data,
+            'services': user_services,
+            'tasks': user_tasks
+        }
+
+        return Response(data)

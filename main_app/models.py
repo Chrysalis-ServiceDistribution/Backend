@@ -1,13 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-
 class StatusChoices(models.TextChoices):
     PENDING = 'P', 'Pending'
     IN_PROGRESS = 'IP', 'In Progress'
     COMPLETED = 'C', 'Completed'
     CANCELLED = 'X', 'Cancelled'
-
 
 class FieldType(models.TextChoices):
     TEXT = 'text', 'Text'
@@ -31,11 +29,9 @@ class Service(models.Model):
     def __str__(self):
         return f'Service created by {self.user.username}, {self.name}, {self.description}'
 
-
 class Task(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='tasks')
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tasks')
-    req = models.JSONField()
     status = models.CharField(
         max_length=2,
         choices=StatusChoices.choices,
@@ -44,7 +40,6 @@ class Task(models.Model):
 
     def __str__(self):
         return f'Task for {self.service.name} by {self.client.username}'
-
 
 class FormField(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='form_fields')
@@ -55,7 +50,6 @@ class FormField(models.Model):
 
     def __str__(self):
         return f'{self.prompt} ({self.get_type_display()})'
-
 
 class RequestField(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='request_fields')
@@ -68,4 +62,3 @@ class RequestField(models.Model):
 
     def __str__(self):
         return f'{self.get_type_display()} field for Task {self.task.id}'
-
