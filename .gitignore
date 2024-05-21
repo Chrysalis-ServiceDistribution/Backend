@@ -36,6 +36,7 @@ media
 
 # Environments
 .env
+.gitignore
 .env.local
 .env.development.local
 .env.test
