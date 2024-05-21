@@ -11,22 +11,22 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-#import environ
-#import dj_database_url
-#import django_heroku
+import environ  
+import dj_database_url
+import django_heroku
 
 # catcollector/settings.py
 
 # Initialise environment variables
-#env = environ.Env()
-#environ.Env.read_env()
+env = environ.Env()
+environ.Env.read_env()
 
 
 # catcollector/settings.py
 
 # These are required
-#DATABASE_URL=env('DATABASE_URL')
-#SECRET_KEY=env('SECRET_KEY')
+DATABASE_URL=env('DATABASE_URL')
+SECRET_KEY=env('SECRET_KEY')
 
 # These are not required.
 # If you want to connect locally to the database you may need them
@@ -52,7 +52,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-!5k4i+q(pf%g026ybs9*(_#$p@)i^e6_pu3os388zv=xb0v6^n'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG') == 'true'
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.herokuapp.com']
 
@@ -136,20 +136,20 @@ WSGI_APPLICATION = 'chrysalis.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-     'default': {
-         'ENGINE': 'django.db.backends.postgresql',
-         'NAME': 'chrysalis',
-         'USER': 'chrys_admin',
-         'PASSWORD': 'password',
-         'HOST': 'localhost'
-     }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'chrysalis',
+#         'USER': 'chrys_admin',
+#         'PASSWORD': 'password',
+#         'HOST': 'localhost'
+#     }
+# }
 
-#DATABASES = {
-#    'default':
- #       dj_database_url.config('DATABASE_URL')
-#}
+DATABASES = {
+    'default':
+        dj_database_url.config('DATABASE_URL')
+}
 
 
 # Password validation
@@ -193,4 +193,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#django_heroku.settings(locals())
+django_heroku.settings(locals())
+
+if DEBUG and 'OPTIONS' in DATABASES['default']:
+    del DATABASES['default']['OPTIONS']['sslmode']
+
