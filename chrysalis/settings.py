@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-import environ  
+import environ
+import os
 import dj_database_url
 import django_heroku
 
@@ -136,20 +137,20 @@ WSGI_APPLICATION = 'chrysalis.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'chrysalis',
-#         'USER': 'chrys_admin',
-#         'PASSWORD': 'password',
-#         'HOST': 'localhost'
-#     }
-# }
-
 DATABASES = {
-    'default':
-        dj_database_url.config('DATABASE_URL')
+     'default': {
+         'ENGINE': 'django.db.backends.postgresql',
+         'NAME': 'chrysalis',
+         'USER': 'chrys_admin',
+         'PASSWORD': 'password',
+         'HOST': 'localhost'
+     }
 }
+
+#DATABASES = {
+ #   'default':
+  #      dj_database_url.config('DATABASE_URL')
+#}
 
 
 # Password validation
