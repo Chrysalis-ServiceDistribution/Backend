@@ -3,7 +3,7 @@ from .views import (
     Home,
     CreateUserView, LoginView, VerifyUserView, UserProfileView,
     ServiceList, ServiceDetail, ServiceFormFields,
-    TaskList, TaskDetail,
+    TaskList, TaskDetail, UserTasksList,
     FormFieldList, FormFieldDetail,
     RequestFieldList, RequestFieldDetail,
     SubmitRequest, UpdateTaskStatus,
@@ -26,6 +26,7 @@ urlpatterns = [
 
     path('tasks/', TaskList.as_view(), name='task_list'),
     path('tasks/<int:pk>/', TaskDetail.as_view(), name='task_detail'),
+    path('user/tasks/', UserTasksList.as_view(), name='user_tasks'),
 
     path('formfields/', FormFieldList.as_view(), name='formfield_list'),
     path('formfields/<int:pk>/', FormFieldDetail.as_view(), name='formfield_detail'),

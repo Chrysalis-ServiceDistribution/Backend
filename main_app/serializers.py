@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from rest_framework import serializers, generics
 from django.contrib.auth.models import User
 from .models import Service, Task, FormField, RequestField, StatusChoices, FieldType, UserProfile
 
@@ -40,6 +40,7 @@ class UserSerializer(serializers.ModelSerializer):
         profile.save()
 
         return instance
+
 
 class FormFieldSerializer(serializers.ModelSerializer):
     class Meta:
@@ -104,6 +105,7 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = ['id', 'service', 'client', 'req', 'status', 'request_fields']
+
 
     def create(self, validated_data):
         request_fields_data = validated_data.pop('request_fields', [])

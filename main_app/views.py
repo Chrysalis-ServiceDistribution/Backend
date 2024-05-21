@@ -74,6 +74,15 @@ class UserServiceList(generics.ListAPIView):
         return Service.objects.filter(user_id=user_id)
 
 
+class UserTasksList(generics.ListAPIView):
+    serializer_class = TaskSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Task.objects.filter(client=self.request.user)
+
+
+
 class Home(APIView):
     def get(self, request):
         data = {
