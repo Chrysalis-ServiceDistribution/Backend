@@ -1,20 +1,45 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Service, Task, FormField, RequestField, StatusChoices, FieldType
+from .models import Service, Task, FormField, RequestField, StatusChoices, FieldType, UserProfile
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['bio', 'location', 'birth_date']
+
 
 class UserSerializer(serializers.ModelSerializer):
+    profile = UserProfileSerializer()
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password']
+        fields = ['id', 'username', 'email', 'password', 'profile']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
+        profile_data = validated_data.pop('profile')
         user = User.objects.create_user(
             email=validated_data['email'],
             password=validated_data['password'],
             username=validated_data['username']
         )
+        UserProfile.objects.create(user=user, **profile_data)
         return user
+
+    def update(self, instance, validated_data):
+        profile_data = validated_data.pop('profile')
+        instance.email = validated_data.get('email', instance.email)
+        instance.username = validated_data.get('username', instance.username)
+        instance.save()
+
+        profile = instance.profile
+        profile.bio = profile_data.get('bio', profile.bio)
+        profile.location = profile_data.get('location', profile.location)
+        profile.birth_date = profile_data.get('birth_date', profile.birth_date)
+        profile.save()
+
+        return instance
 
 class FormFieldSerializer(serializers.ModelSerializer):
     class Meta:

@@ -57,6 +57,13 @@ class VerifyUserView(APIView):
             'user': UserSerializer(user).data
         })
 
+class UserProfileView(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
 
 class UserServiceList(generics.ListAPIView):
     serializer_class = ServiceSerializer
