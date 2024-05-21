@@ -176,7 +176,6 @@ class SubmitRequest(APIView):
         task_data = {
             'service': service.id,
             'client': client.id,
-            'req': request.data['req'],
             'status': StatusChoices.PENDING
         }
         task_serializer = TaskSerializer(data=task_data)
@@ -189,12 +188,13 @@ class SubmitRequest(APIView):
                     type=field_data['type'],
                     value=field_data['value'],
                     index=field_data['index'],
-                    options=field_data['options'],
+                    options=field_data.get('options', None),
                     prompt=form_field.prompt,  # Copy prompt
                     choices=form_field.choices  # Copy choices
                 )
             return Response(task_serializer.data, status=status.HTTP_201_CREATED)
         return Response(task_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class UpdateTaskStatus(APIView):
