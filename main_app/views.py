@@ -65,6 +65,14 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
+class UserProfileUpdateView(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
 class UserServiceList(generics.ListAPIView):
     serializer_class = ServiceSerializer
     permission_classes = [permissions.IsAuthenticated]
