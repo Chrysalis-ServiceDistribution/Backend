@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     Home,
-    CreateUserView, LoginView, VerifyUserView,
+    CreateUserView, LoginView, VerifyUserView, UserProfileView,
     ServiceList, ServiceDetail, ServiceFormFields,
     TaskList, TaskDetail,
     FormFieldList, FormFieldDetail,
@@ -15,6 +15,8 @@ urlpatterns = [
     path('auth/register/', CreateUserView.as_view(), name='register'),
     path('auth/login/', LoginView.as_view(), name='login'),
     path('auth/verify/', VerifyUserView.as_view(), name='verify'),
+
+    path('profile/', UserProfileView.as_view(), name='user_profile'),
 
     path('services/', ServiceList.as_view(), name='service_list'),
     path('services/<int:pk>/', ServiceDetail.as_view(), name='service_detail'),
