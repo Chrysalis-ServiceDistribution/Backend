@@ -11,22 +11,22 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-import environ
-import dj_database_url
-import django_heroku
+#import environ
+#import dj_database_url
+#import django_heroku
 
 # catcollector/settings.py
 
 # Initialise environment variables
-env = environ.Env()
-environ.Env.read_env()
+#env = environ.Env()
+#environ.Env.read_env()
 
 
 # catcollector/settings.py
 
 # These are required
-DATABASE_URL=env('DATABASE_URL')
-SECRET_KEY=env('SECRET_KEY')
+#DATABASE_URL=env('DATABASE_URL')
+#SECRET_KEY=env('SECRET_KEY')
 
 # These are not required.
 # If you want to connect locally to the database you may need them
@@ -136,20 +136,20 @@ WSGI_APPLICATION = 'chrysalis.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'chrysalis',
-#         'USER': 'chrys_admin',
-#         'PASSWORD': 'password',
-#         'HOST': 'localhost'
-#     }
-# }
-
 DATABASES = {
-    'default': 
-        dj_database_url.config('DATABASE_URL')
+     'default': {
+         'ENGINE': 'django.db.backends.postgresql',
+         'NAME': 'chrysalis',
+         'USER': 'chrys_admin',
+         'PASSWORD': 'password',
+         'HOST': 'localhost'
+     }
 }
+
+#DATABASES = {
+#    'default':
+ #       dj_database_url.config('DATABASE_URL')
+#}
 
 
 # Password validation
@@ -193,4 +193,4 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-django_heroku.settings(locals())
+#django_heroku.settings(locals())
