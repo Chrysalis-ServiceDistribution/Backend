@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 class StatusChoices(models.TextChoices):
     PENDING = 'P', 'Pending'
+    ACCEPTED = 'A', 'Accepted'
     IN_PROGRESS = 'IP', 'In Progress'
     COMPLETED = 'C', 'Completed'
     CANCELLED = 'X', 'Cancelled'
