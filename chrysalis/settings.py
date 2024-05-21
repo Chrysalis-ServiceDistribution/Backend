@@ -52,7 +52,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-!5k4i+q(pf%g026ybs9*(_#$p@)i^e6_pu3os388zv=xb0v6^n'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG') == 'true'
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.herokuapp.com']
 
@@ -147,7 +147,7 @@ WSGI_APPLICATION = 'chrysalis.wsgi.application'
 # }
 
 DATABASES = {
-    'default': 
+    'default':
         dj_database_url.config('DATABASE_URL')
 }
 
@@ -194,3 +194,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 django_heroku.settings(locals())
+
+if DEBUG and 'OPTIONS' in DATABASES['default']:
+    del DATABASES['default']['OPTIONS']['sslmode']
+
