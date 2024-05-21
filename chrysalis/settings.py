@@ -147,7 +147,7 @@ WSGI_APPLICATION = 'chrysalis.wsgi.application'
 # }
 
 DATABASES = {
-    'default': 
+    'default':
         dj_database_url.config('DATABASE_URL')
 }
 
@@ -194,3 +194,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 django_heroku.settings(locals())
+
+if DEBUG and 'OPTIONS' in DATABASES['default']:
+    del DATABASES['default']['OPTIONS']['sslmode']
+
