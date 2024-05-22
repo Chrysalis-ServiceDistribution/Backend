@@ -200,7 +200,7 @@ class SubmitRequest(APIView):
 class UpdateTaskStatus(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, task_id):
+    def put(self, request, task_id):
         task = get_object_or_404(Task, id=task_id)
         new_status = request.data.get('status')
         if new_status not in dict(StatusChoices.choices):
