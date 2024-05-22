@@ -79,6 +79,10 @@ class ServiceSerializer(serializers.ModelSerializer):
         return service
 
     def update(self, instance, validated_data):
+        open_tasks = Task.objects.filter(service=instance, status__in=[StatusChoices.PENDING, StatusChoices.IN_PROGRESS, StatusChoices.ACCEPTED])
+        if open_tasks.exists():
+            raise serializers.ValidationError("Cannot update service while there are open tasks.")
+
         form_fields_data = validated_data.pop('form_fields', [])
         instance.name = validated_data.get('name', instance.name)
         instance.description = validated_data.get('description', instance.description)
@@ -87,7 +91,6 @@ class ServiceSerializer(serializers.ModelSerializer):
         # Clear existing form fields to prevent duplication
         instance.form_fields.all().delete()
 
-        # Create new form fields
         for form_field_data in form_fields_data:
             FormField.objects.create(service=instance, **form_field_data)
         return instance
