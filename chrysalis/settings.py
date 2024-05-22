@@ -28,7 +28,6 @@ environ.Env.read_env()
 # These are required
 DATABASE_URL=env('DATABASE_URL')
 SECRET_KEY=env('SECRET_KEY')
-FRONTEND_URL=env('FRONTEND_URL')
 
 # These are not required.
 # If you want to connect locally to the database you may need them
