@@ -98,7 +98,7 @@ class ServiceSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         open_tasks = Task.objects.filter(service=instance, status__in=[StatusChoices.PENDING, StatusChoices.IN_PROGRESS, StatusChoices.ACCEPTED])
-        if open_tasks.exists():
+        if open_tasks exists():
             raise serializers.ValidationError("Cannot update service while there are open tasks.")
 
         form_fields_data = validated_data.pop('form_fields', [])
