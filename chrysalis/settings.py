@@ -32,7 +32,7 @@ environ.Env.read_env()
 # These are required
 DATABASE_URL=env('DATABASE_URL')
 SECRET_KEY=env('SECRET_KEY')
-
+FRONTEND_DEPLOYMENT_URL=env('FRONTEND_DEPLOYMENT_URL')
 # These are not required.
 # If you want to connect locally to the database you may need them
 # Something to be aware of, nothing more.
@@ -51,7 +51,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.herokuapp.com', '.netlify.app', 'fr
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:3000",
-    env('FRONTEND_DEPLOYMENT_URL'),
+    FRONTEND_DEPLOYMENT_URL,
     'https://frontend-chrys-2dqr12t47-william-scotts-projects.vercel.app',
 ]
 
