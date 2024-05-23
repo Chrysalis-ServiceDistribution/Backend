@@ -46,12 +46,13 @@ SECRET_KEY=env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG') == 'true'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.herokuapp.com', '.netlify.app']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.herokuapp.com', '.netlify.app', 'frontend-chrys-2dqr12t47-william-scotts-projects.vercel.app']
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:3000",
-    env('FRONTEND_DEPLOYMENT_URL')
+    env('FRONTEND_DEPLOYMENT_URL'),
+    'frontend-chrys-2dqr12t47-william-scotts-projects.vercel.app'
 ]
 
 
