@@ -63,16 +63,6 @@ class RequestFieldSerializer(serializers.ModelSerializer):
             return FormFieldSerializer(form_field).data
         return None
 
-class FeedbackSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Feedback
-        fields = ['service', 'user', 'rating', 'comment', 'created_at']
-
-class UserFeedbackSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserFeedback
-        fields = ['rated_user', 'rating_user', 'rating', 'comment', 'created_at']
-
 class ServiceSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     form_fields = NestedFormFieldSerializer(many=True)
@@ -105,4 +95,29 @@ class ServiceSerializer(serializers.ModelSerializer):
             FormField.objects.create(service=instance, **form_field_data)
         return instance
 
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = ['service', 'user', 'rating', 'comment', 'created_at']
 
+class UserFeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserFeedback
+        fields = ['rated_user', 'rating_user', 'rating', 'comment', 'created_at']
+
+class TaskSerializer(serializers.ModelSerializer):
+    service = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all())
+    client = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    request_fields = RequestFieldSerializer(many=True, required=False)
+    status = serializers.ChoiceField(choices=StatusChoices.choices, default=StatusChoices.PENDING)
+
+    class Meta:
+        model = Task
+        fields = ['id', 'service', 'client', 'status', 'request_fields']
+
+    def create(self, validated_data):
+        request_fields_data = validated_data.pop('request_fields', [])
+        task = Task.objects.create(**validated_data)
+        for request_field_data in request_fields_data:
+            RequestField.objects.create(task=task, **request_field_data)
+        return task

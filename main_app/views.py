@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
-from .models import Service, Task, FormField, RequestField, StatusChoices, Feedback, UserFeedback
+from .models import Service, Task, FormField, RequestField, StatusChoices, Feedback
 from .serializers import UserSerializer, ServiceSerializer, TaskSerializer, FormFieldSerializer, RequestFieldSerializer, FeedbackSerializer, UserFeedbackSerializer
 
 class CreateUserView(generics.CreateAPIView):
