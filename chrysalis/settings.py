@@ -52,7 +52,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:3000",
     env('FRONTEND_DEPLOYMENT_URL'),
-    'frontend-chrys-2dqr12t47-william-scotts-projects.vercel.app'
+    'https://frontend-chrys-2dqr12t47-william-scotts-projects.vercel.app',
 ]
 
 
