@@ -6,9 +6,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
-from .models import Service, Task, FormField, RequestField, StatusChoices
-from .serializers import UserSerializer, ServiceSerializer, TaskSerializer, FormFieldSerializer, RequestFieldSerializer
-
+from .models import Service, Task, FormField, RequestField, StatusChoices, Feedback, UserFeedback
+from .serializers import UserSerializer, ServiceSerializer, TaskSerializer, FormFieldSerializer, RequestFieldSerializer, FeedbackSerializer, UserFeedbackSerializer
 
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -24,7 +23,6 @@ class CreateUserView(generics.CreateAPIView):
             'access': str(refresh.access_token),
             'user': response.data
         })
-
 
 class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -42,7 +40,6 @@ class LoginView(APIView):
                 'user': UserSerializer(user).data
             })
         return Response({'error': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-
 
 class VerifyUserView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -81,7 +78,6 @@ class UserServiceList(generics.ListAPIView):
         user_id = self.kwargs['user_id']
         return Service.objects.filter(user_id=user_id)
 
-
 class UserTasksList(generics.ListAPIView):
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -103,7 +99,6 @@ class Home(APIView):
         }
         return Response(data)
 
-
 class ServiceList(generics.ListCreateAPIView):
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
@@ -111,7 +106,6 @@ class ServiceList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
 
 class ServiceDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Service.objects.all()
@@ -121,6 +115,14 @@ class ServiceDetail(generics.RetrieveUpdateDestroyAPIView):
     def perform_update(self, serializer):
         serializer.save()
 
+    def get(self, request, *args, **kwargs):
+        service = self.get_object()
+        feedbacks = Feedback.objects.filter(service=service)
+        feedback_data = FeedbackSerializer(feedbacks, many=True).data
+        service_data = ServiceSerializer(service).data
+        service_data['feedbacks'] = feedback_data
+
+        return Response(service_data)
 
 class ServiceFormFields(generics.ListCreateAPIView):
     serializer_class = FormFieldSerializer
@@ -130,42 +132,35 @@ class ServiceFormFields(generics.ListCreateAPIView):
         service_id = self.kwargs['pk']
         return FormField.objects.filter(service_id=service_id)
 
-
 class TaskList(generics.ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
-
 
 class TaskDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-
 class FormFieldList(generics.ListCreateAPIView):
     queryset = FormField.objects.all()
     serializer_class = FormFieldSerializer
     permission_classes = [permissions.IsAuthenticated]
-
 
 class FormFieldDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = FormField.objects.all()
     serializer_class = FormFieldSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-
 class RequestFieldList(generics.ListCreateAPIView):
     queryset = RequestField.objects.all()
     serializer_class = RequestFieldSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-
 class RequestFieldDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = RequestField.objects.all()
     serializer_class = RequestFieldSerializer
     permission_classes = [permissions.IsAuthenticated]
-
 
 class SubmitRequest(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -195,12 +190,10 @@ class SubmitRequest(APIView):
             return Response(task_serializer.data, status=status.HTTP_201_CREATED)
         return Response(task_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-
 class UpdateTaskStatus(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, task_id):
+    def put(self, request, task_id):
         task = get_object_or_404(Task, id=task_id)
         new_status = request.data.get('status')
         if new_status not in dict(StatusChoices.choices):
@@ -208,7 +201,6 @@ class UpdateTaskStatus(APIView):
 
         task.status = new_status
         task.save()
-
         return Response(TaskSerializer(task).data, status=status.HTTP_200_OK)
 
 class UserDetailWithServicesAndTasksView(generics.RetrieveAPIView):
@@ -231,3 +223,31 @@ class UserDetailWithServicesAndTasksView(generics.RetrieveAPIView):
         }
 
         return Response(data)
+
+class SubmitServiceFeedback(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, service_id):
+        service = get_object_or_404(Service, id=service_id)
+        data = request.data
+        data['service'] = service.id
+        data['user'] = request.user.id
+        serializer = FeedbackSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class SubmitUserFeedback(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, user_id):
+        rated_user = get_object_or_404(UserProfile, user_id=user_id)
+        data = request.data
+        data['rated_user'] = rated_user.id
+        data['rating_user'] = request.user.profile.id
+        serializer = UserFeedbackSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
