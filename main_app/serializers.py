@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Service, Task, FormField, RequestField, StatusChoices, UserProfile, Feedback, UserFeedback
+from .models import Service, Task, FormField, RequestField, StatusChoices, FieldType, UserProfile
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -98,7 +98,7 @@ class ServiceSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         open_tasks = Task.objects.filter(service=instance, status__in=[StatusChoices.PENDING, StatusChoices.IN_PROGRESS, StatusChoices.ACCEPTED])
-        if open_tasks exists():
+        if open_tasks.exists():
             raise serializers.ValidationError("Cannot update service while there are open tasks.")
 
         form_fields_data = validated_data.pop('form_fields', [])
@@ -112,13 +112,3 @@ class ServiceSerializer(serializers.ModelSerializer):
         for form_field_data in form_fields_data:
             FormField.objects.create(service=instance, **form_field_data)
         return instance
-
-class FeedbackSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Feedback
-        fields = ['service', 'user', 'rating', 'comment', 'created_at']
-
-class UserFeedbackSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserFeedback
-        fields = ['rated_user', 'rating_user', 'rating', 'comment', 'created_at']
