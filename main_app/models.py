@@ -1,19 +1,26 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-
 class StatusChoices(models.TextChoices):
     PENDING = 'P', 'Pending'
+    ACCEPTED = 'A', 'Accepted'
     IN_PROGRESS = 'IP', 'In Progress'
     COMPLETED = 'C', 'Completed'
     CANCELLED = 'X', 'Cancelled'
-
 
 class FieldType(models.TextChoices):
     TEXT = 'text', 'Text'
     RADIO = 'radio', 'Radio'
     CHECKBOX = 'checkbox', 'Checkbox'
 
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    bio = models.TextField(blank=True, null=True)
+    location = models.CharField(max_length=30, blank=True, null=True)
+    birth_date = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return self.user.username
 
 class Service(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='services')
@@ -23,11 +30,9 @@ class Service(models.Model):
     def __str__(self):
         return f'Service created by {self.user.username}, {self.name}, {self.description}'
 
-
 class Task(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='tasks')
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tasks')
-    req = models.JSONField()
     status = models.CharField(
         max_length=2,
         choices=StatusChoices.choices,
@@ -36,7 +41,6 @@ class Task(models.Model):
 
     def __str__(self):
         return f'Task for {self.service.name} by {self.client.username}'
-
 
 class FormField(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='form_fields')
@@ -47,7 +51,6 @@ class FormField(models.Model):
 
     def __str__(self):
         return f'{self.prompt} ({self.get_type_display()})'
-
 
 class RequestField(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='request_fields')
@@ -60,4 +63,3 @@ class RequestField(models.Model):
 
     def __str__(self):
         return f'{self.get_type_display()} field for Task {self.task.id}'
-
