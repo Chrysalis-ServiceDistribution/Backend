@@ -229,10 +229,9 @@ class SubmitServiceFeedback(APIView):
 
     def post(self, request, service_id):
         service = get_object_or_404(Service, id=service_id)
-        data = request.data
+        data = request.data.copy()
         data['service'] = service.id
-        data['user'] = request.user.id
-        serializer = FeedbackSerializer(data=data)
+        serializer = FeedbackSerializer(data=data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

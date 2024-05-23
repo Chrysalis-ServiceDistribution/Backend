@@ -113,10 +113,26 @@ class ServiceSerializer(serializers.ModelSerializer):
             FormField.objects.create(service=instance, **form_field_data)
         return instance
 
+class UserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username']
+
 class FeedbackSerializer(serializers.ModelSerializer):
+    user = UserDetailSerializer(read_only=True)
+
     class Meta:
         model = Feedback
         fields = ['service', 'user', 'rating', 'comment', 'created_at']
+        read_only_fields = ['user', 'created_at']
+
+    def create(self, validated_data):
+        request = self.context.get('request', None)
+        user = request.user
+        feedback = Feedback.objects.create(user=user, **validated_data)
+        return feedback
+
+
 
 class UserFeedbackSerializer(serializers.ModelSerializer):
     class Meta:
