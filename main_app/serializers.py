@@ -1,13 +1,11 @@
-from rest_framework import serializers, generics
+from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Service, Task, FormField, RequestField, StatusChoices, FieldType, UserProfile
-
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ['bio', 'location', 'birth_date']
-
 
 class UserSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer()
@@ -41,13 +39,16 @@ class UserSerializer(serializers.ModelSerializer):
 
         return instance
 
-
 class FormFieldSerializer(serializers.ModelSerializer):
     class Meta:
         model = FormField
         fields = ['id', 'type', 'prompt', 'index', 'choices']
 
-
+class NestedFormFieldSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FormField
+        fields = ['id', 'type', 'prompt', 'index', 'choices']
+        read_only_fields = ['id']
 
 class RequestFieldSerializer(serializers.ModelSerializer):
     form_field = serializers.SerializerMethodField()
@@ -65,20 +66,19 @@ class RequestFieldSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     service = serializers.PrimaryKeyRelatedField(queryset=Service.objects.all())
     client = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    request_fields = RequestFieldSerializer(many=True, read_only=True)
+    request_fields = RequestFieldSerializer(many=True, required=False)
+    status = serializers.ChoiceField(choices=StatusChoices.choices, default=StatusChoices.PENDING)
 
     class Meta:
         model = Task
-        fields = [
-            'id', 'service', 'client', 'status', 'request_fields'
-        ]
+        fields = ['id', 'service', 'client', 'status', 'request_fields']
 
-class NestedFormFieldSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FormField
-        fields = ['id', 'type', 'prompt', 'index', 'choices']
-        read_only_fields = ['id']
-
+    def create(self, validated_data):
+        request_fields_data = validated_data.pop('request_fields', [])
+        task = Task.objects.create(**validated_data)
+        for request_field_data in request_fields_data:
+            RequestField.objects.create(task=task, **request_field_data)
+        return task
 
 class ServiceSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -97,14 +97,18 @@ class ServiceSerializer(serializers.ModelSerializer):
         return service
 
     def update(self, instance, validated_data):
+        open_tasks = Task.objects.filter(service=instance, status__in=[StatusChoices.PENDING, StatusChoices.IN_PROGRESS, StatusChoices.ACCEPTED])
+        if open_tasks.exists():
+            raise serializers.ValidationError("Cannot update service while there are open tasks.")
+
         form_fields_data = validated_data.pop('form_fields', [])
         instance.name = validated_data.get('name', instance.name)
         instance.description = validated_data.get('description', instance.description)
         instance.save()
 
+        # Clear existing form fields to prevent duplication
         instance.form_fields.all().delete()
 
-        # Create new form fields
         for form_field_data in form_fields_data:
             FormField.objects.create(service=instance, **form_field_data)
         return instance

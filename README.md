@@ -127,7 +127,3 @@ Task Status
 ### Documentation 
 
 * https://www.notion.so/Chrysalis-b6df202c27b249d88f67784330a4facc?pvs=4
-
-
-
-

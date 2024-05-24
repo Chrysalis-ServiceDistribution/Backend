@@ -176,7 +176,6 @@ class SubmitRequest(APIView):
         task_data = {
             'service': service.id,
             'client': client.id,
-            'req': request.data['req'],
             'status': StatusChoices.PENDING
         }
         task_serializer = TaskSerializer(data=task_data)
@@ -189,7 +188,7 @@ class SubmitRequest(APIView):
                     type=field_data['type'],
                     value=field_data['value'],
                     index=field_data['index'],
-                    options=field_data['options'],
+                    options=field_data.get('options', None),
                     prompt=form_field.prompt,  # Copy prompt
                     choices=form_field.choices  # Copy choices
                 )
@@ -197,10 +196,11 @@ class SubmitRequest(APIView):
         return Response(task_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
 class UpdateTaskStatus(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, task_id):
+    def put(self, request, task_id):
         task = get_object_or_404(Task, id=task_id)
         new_status = request.data.get('status')
         if new_status not in dict(StatusChoices.choices):
