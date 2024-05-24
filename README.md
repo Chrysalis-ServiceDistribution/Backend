@@ -27,15 +27,15 @@ Track ongoing projects.
 
 ### How to Use the Application
 
-1. Access the Registration Page Access the registration page and create an account with your email.
+1. Access the Registration PageAccess the registration page and create an account with your email.
 
 
-2. Dashboard After logging in, you enter the dashboard. Depending on the role, clients can create new tasks. Creators can see all tasks requested and their progress.
+2. DashboardAfter logging in, you enter the dashboard. Depending on the role, clients can create new tasks. Creators can see all tasks requested and their progress.
 
 
-3. Search for a New Server Clients create tasks for freelancers.
+3. Search for a New ServerClients create tasks for freelancers.
 
-4. Service Creators can accept tasks or decline the service and change the status of the task.
+4. ServiceCreators can accept tasks or decline the service and change the status of the task.
 
 
 
