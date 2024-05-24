@@ -6,7 +6,7 @@
 # Description:
 
 
-Freelancer Connect is a platform designed to connect freelancers with clients seeking professional services. The app allows freelancers to create detailed profiles, showcase their skills and portfolios, and receive personalized job offers.
+Chrysalis is a platform designed to connect freelancers with clients seeking professional services. The app allows freelancers to create detailed profiles, showcase their skills and portfolios, and receive personalized job offers.
 
 ## Key Features:
 
