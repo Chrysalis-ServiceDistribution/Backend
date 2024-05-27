@@ -7,7 +7,7 @@ from .views import (
     FormFieldList, FormFieldDetail,
     RequestFieldList, RequestFieldDetail,
     SubmitRequest, UpdateTaskStatus,
-    UserServiceList, UserDetailWithServicesAndTasksView
+    UserServiceList, UserDetailWithServicesAndTasksView, SubmitServiceFeedback, SubmitUserFeedback
 )
 
 urlpatterns = [
@@ -40,4 +40,6 @@ urlpatterns = [
 
     # New route to get user details, services, and tasks by user ID
     path('users/<int:user_id>/details/', UserDetailWithServicesAndTasksView.as_view(), name='user_detail_with_services_and_tasks'),
+    path('services/<int:service_id>/feedback/', SubmitServiceFeedback.as_view(), name='submit_service_feedback'),
+    path('users/<int:user_id>/feedback/', SubmitUserFeedback.as_view(), name='submit_user_feedback'),
 ]

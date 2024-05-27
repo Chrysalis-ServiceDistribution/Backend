@@ -30,6 +30,20 @@ class Service(models.Model):
     def __str__(self):
         return f'Service created by {self.user.username}, {self.name}, {self.description}'
 
+class Feedback(models.Model):
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='feedback')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='feedback')
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class UserFeedback(models.Model):
+    rated_user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='ratings_received')
+    rating_user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='ratings_given')
+    rating = models.IntegerField(choices=[(i, i) for i in range(1, 6)])
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 class Task(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='tasks')
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tasks')

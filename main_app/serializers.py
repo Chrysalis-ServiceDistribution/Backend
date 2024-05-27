@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Service, Task, FormField, RequestField, StatusChoices, FieldType, UserProfile
+from .models import Service, Task, FormField, RequestField, StatusChoices, UserProfile, Feedback, UserFeedback
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -112,3 +112,29 @@ class ServiceSerializer(serializers.ModelSerializer):
         for form_field_data in form_fields_data:
             FormField.objects.create(service=instance, **form_field_data)
         return instance
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username']
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    user = UserDetailSerializer(read_only=True)
+
+    class Meta:
+        model = Feedback
+        fields = ['service', 'user', 'rating', 'comment', 'created_at']
+        read_only_fields = ['user', 'created_at']
+
+    def create(self, validated_data):
+        request = self.context.get('request', None)
+        user = request.user
+        feedback = Feedback.objects.create(user=user, **validated_data)
+        return feedback
+
+
+
+class UserFeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserFeedback
+        fields = ['rated_user', 'rating_user', 'rating', 'comment', 'created_at']
