@@ -7,6 +7,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = ['bio', 'location', 'birth_date']
 
+
 class UserSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer()
 
@@ -26,18 +27,23 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
-        profile_data = validated_data.pop('profile')
+        profile_data = validated_data.pop('profile', None)
+
         instance.email = validated_data.get('email', instance.email)
         instance.username = validated_data.get('username', instance.username)
+        if 'password' in validated_data:
+            instance.set_password(validated_data['password'])
         instance.save()
 
-        profile = instance.profile
-        profile.bio = profile_data.get('bio', profile.bio)
-        profile.location = profile_data.get('location', profile.location)
-        profile.birth_date = profile_data.get('birth_date', profile.birth_date)
-        profile.save()
+        if profile_data:
+            profile = instance.profile
+            profile.bio = profile_data.get('bio', profile.bio)
+            profile.location = profile_data.get('location', profile.location)
+            profile.birth_date = profile_data.get('birth_date', profile.birth_date)
+            profile.save()
 
         return instance
+
 
 class FormFieldSerializer(serializers.ModelSerializer):
     class Meta:

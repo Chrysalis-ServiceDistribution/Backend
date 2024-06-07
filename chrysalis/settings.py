@@ -16,9 +16,6 @@ import os
 import dj_database_url
 import django_heroku
 
-# catcollector/settings.py
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,34 +23,33 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
 environ.Env.read_env()
 
-
-# catcollector/settings.py
-
-# These are required
-DATABASE_URL=env('DATABASE_URL')
-SECRET_KEY=env('SECRET_KEY')
-
-# These are not required.
-# If you want to connect locally to the database you may need them
-# Something to be aware of, nothing more.
-
-# PGDATABASE=env('PGDATABASE')
-# PGHOST=env('PGHOST')
-# PGPASSWORD=env('PGPASSWORD')
-# PGPORT=env('PGPORT')
-# PGUSER=env('PGUSER')
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG') == 'true'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.herokuapp.com']
+# Secret key for your Django project
+SECRET_KEY = env('SECRET_KEY')
+
+# Database connection URL
+DATABASE_URL = env('DATABASE_URL')
+
+# Additional environment variables
+FRONTEND_DEPLOYMENT_URL = env('FRONTEND_DEPLOYMENT_URL')
+
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '.herokuapp.com',
+    '.netlify.app',
+    'frontend-chrys-2dqr12t47-william-scotts-projects.vercel.app'
+]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:3000",
-    env('FRONTEND_DEPLOYMENT_URL')
+    FRONTEND_DEPLOYMENT_URL,
+    'https://frontend-chrys-2dqr12t47-william-scotts-projects.vercel.app',
+    "https://chrysaliss.netlify.app",
 ]
-
 
 # Application definition
 
@@ -99,7 +95,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -126,7 +122,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'chrysalis.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -140,11 +135,10 @@ DATABASES = {
      }
 }
 
-#DATABASES = {
- #   'default':
-  #      dj_database_url.config('DATABASE_URL')
-#}
-
+# DATABASES = {
+#    'default':
+#        dj_database_url.config('DATABASE_URL')
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -164,7 +158,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -175,7 +168,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -191,4 +183,3 @@ django_heroku.settings(locals())
 
 if DEBUG and 'OPTIONS' in DATABASES['default']:
     del DATABASES['default']['OPTIONS']['sslmode']
-
