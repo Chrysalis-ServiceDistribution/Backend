@@ -53,6 +53,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     FRONTEND_DEPLOYMENT_URL,
     'https://frontend-chrys-2dqr12t47-william-scotts-projects.vercel.app',
+    "https://chrysaliss.netlify.app",
 ]
 
 
